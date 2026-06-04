@@ -53,7 +53,7 @@ If you'd like, I can also:
 **Deploying to Netlify**
 
 1. Create a new site on Netlify and connect your Git repository.
-2. In the Netlify site settings, set the environment variable `NEXT_PUBLIC_OPENAI_API_KEY` to your OpenAI key (do not paste it into code).
+2. In the Netlify site settings, set the environment variable `OPENAI_API_KEY` to your OpenAI key (do not paste it into code). The app uses a serverless API route to keep the key secret.
 3. Set the build command to:
 
 ```bash
@@ -65,7 +65,7 @@ pnpm build
 
 Notes:
 - Use the `.env.example` file as a template for required environment variables.
-- For production, prefer server-side calls that keep secrets out of client-side bundles. This project currently reads `NEXT_PUBLIC_OPENAI_API_KEY` on the client — consider moving OpenAI calls to a serverless function and storing the key as a secure env var.
+- For production, server-side calls keep secrets out of client-side bundles. This project now proxies OpenAI requests through a serverless API route at `/api/openai` and reads the secret from `process.env.OPENAI_API_KEY`.
 
 
 

@@ -121,48 +121,18 @@ export default function InterviewRoom() {
   }
 
   const getAIResponse = async (prompt: string): Promise<string> => {
-    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
-    if (!apiKey) throw new Error('OpenAI API key not configured')
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const res = await fetch('/api/openai', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: `You are an expert technical interviewer for ${config?.jobTitle} positions. Your job is to:
-1. Ask challenging but fair technical and behavioral questions
-2. Follow up based on the candidate's answers
-3. Provide constructive feedback
-Keep responses concise (2-3 sentences max for questions, 1-2 sentences for follow-ups).`,
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 150,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || `API error: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data.choices[0]?.message?.content || 'Could not generate response'
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'OpenAI proxy error')
+      return data.content || 'Could not generate response'
     } catch (error) {
-      if (error instanceof Error) {
-        throw error
-      }
+      if (error instanceof Error) throw error
       throw new Error('Failed to get AI response')
     }
   }
